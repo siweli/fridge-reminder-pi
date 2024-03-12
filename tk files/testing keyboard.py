@@ -21,10 +21,6 @@ class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
 
-        # self.winfo_screenwidth()
-        # self.winfo_screenheight()
-
-
     # variables for later use
         font_size = font.Font(size=self.winfo_screenwidth()//100)
         screen_dim = f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}"
@@ -32,7 +28,6 @@ class App(tk.Tk):
 
     # window setup
         self.title("Entry-Summon-kb")
-        # self.geometry("400x400+0+0")
         self.attributes("-fullscreen", True)
         self.config(bg="#999")
 
