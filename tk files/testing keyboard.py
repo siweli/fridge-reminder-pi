@@ -21,6 +21,9 @@ class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
 
+        # self.winfo_screenwidth()
+        # self.winfo_screenheight()
+
 
     # variables for later use
         font_size = font.Font(size=self.winfo_screenwidth()//100)
@@ -29,8 +32,12 @@ class App(tk.Tk):
 
     # window setup
         self.title("Entry-Summon-kb")
-        self.geometry("400x400+0+0")
+        # self.geometry("400x400+0+0")
+        self.attributes("-fullscreen", True)
         self.config(bg="#999")
+
+        btn = tk.Button(self, text="X", command=lambda: self.quit())
+        btn.grid(row=0, column=1)
     
 
     # create a keyboard from my custom keyboard library
@@ -43,67 +50,73 @@ class App(tk.Tk):
     
         
 
-    # display some crap
+    # entry
         tk.Label(self, text="entry").grid(row=0, column=0)
-        entry = tk.Entry(self)
-        self.entry = entry
-        entry.grid(row=1, column=0)
+        item_name = tk.Entry(self)
+        item_name.grid(row=1, column=0)
 
-        entry.bind("<FocusIn>", self.entry_focus_in)
-        #entry.bind("<FocusOut>", self.entry_focus_out)
+        expiry = tk.Entry(self)
+        expiry.grid(row=2, column=0)
+
+        item_name.bind("<FocusIn>", self.entry_focus_in)
+        expiry.bind("<FocusIn>", self.entry_focus_in)
 
         self.out = tk.Label(self, text="output")
-        self.out.grid(row=2, column=0)
+        self.out.grid(row=3, column=0)
 
     
 
     
     # methods
     def entry_focus_in(self, event):
+        self.focus = self.focus_get()
         self.kb.show()
 
     def entry_focus_out(self, event):
         self.kb.hide()
+
+    def output(self, _from, text):
+        print(_from+":",text)
     
 
     # handle the keyboard and it's outputs
     def return_key(self, key):
-        cursor_i = self.entry.index("insert")
+        cursor_i = self.focus.index("insert")
         if not self.caps:
             key = key.lower()
 
         if key.upper() == "SPACE":
-            self.entry.insert(cursor_i, " ")
+            self.focus.insert(cursor_i, " ")
 
         elif key.upper() == "BACK":
-            contents = self.entry.get()
+            contents = self.focus.get()
             index = cursor_i-1
             if index == -1:
                 pass
             else:
-                self.entry.delete(0, "end")
+                self.focus.delete(0, "end")
                 contents = contents[:index] + contents[index+1:]
-                self.entry.insert(0, contents)
-                self.entry.icursor(index)
+                self.focus.insert(0, contents)
+                self.focus.icursor(index)
 
         elif key.upper() == "CAPS":
             self.caps = not self.caps
 
-
         elif key.upper() == "ENTER":
-            txt = self.entry.get()
-            self.out.config(text=txt)
+            txt = self.focus.get()
+            # self.out.config(text=txt)
+            self.output(self.focus.winfo_name(), txt)
 
         elif key == "<":
-            self.entry.icursor(cursor_i-1)
+            self.focus.icursor(cursor_i-1)
         
         elif key == ">":
-            self.entry.icursor(cursor_i+1)
+            self.focus.icursor(cursor_i+1)
 
         else:
-            self.entry.insert(cursor_i, key)
+            self.focus.insert(cursor_i, key)
         
-        self.entry.focus_set()
+        self.focus.focus_set()
     
 
 

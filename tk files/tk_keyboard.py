@@ -20,7 +20,7 @@ class Keyboard(tk.Toplevel):
 
     last_key = None
     
-    def __init__(self, parent, s_height=300, s_width=400): # 300x400 chosen for default size if none passed in
+    def __init__(self, parent=None, s_height=300, s_width=400): # 300x400 chosen for default size if none passed in
         self.parent = parent
         tk.Toplevel.__init__(self)
 
