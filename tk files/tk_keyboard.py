@@ -12,11 +12,11 @@ from tkinter import font
 
 # APP
 class Keyboard(tk.Toplevel):
-    bg_colour = "#008FCC" # background colour
-    ky_colour = "#85daff" # key background colour
-    fg_colour = "#555555" # text colour
-    bd_colour = "#000099" # border colour
-    av_colour = "#004F70" # colour when key is clicked
+    bg_colour = "#000000" # background colour
+    ky_colour = "#555555" # key background colour
+    fg_colour = "#DDDDDD" # text colour
+    bd_colour = "#000000" # border colour
+    av_colour = "#777777" # colour when key is clicked
 
     last_key = None
     

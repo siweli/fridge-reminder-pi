@@ -5,56 +5,62 @@ import tk_keyboard
 
 
 
-# # hide exe window on run when converted into an exe
-# import win32gui, win32con
-# exe_window = win32gui.GetForegroundWindow()
-# if win32gui.GetWindowText(exe_window)[-3:] == "exe":
-#     win32gui.ShowWindow(exe_window, win32con.SW_HIDE)
-
-
-
 # APP
 class App(tk.Tk):
-    bg_colour = "#000000"
-    tx_colour = "#AAAAAA"
+    bg_colour = "#13131B"
+    tx_colour = "#F2285B"
     hl_colour = "#009900"
 
-    entry_contents = {}
     caps = False
     def __init__(self):
         tk.Tk.__init__(self)
 
 
 
-    # variables for later use
+        # variables for later use
         font_size = font.Font(size=self.winfo_screenwidth()//20)
         screen_dim = f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}"
 
-    # window setup
+        # window setup
         self.title("entry label test kb")
         self.attributes("-fullscreen", True)
-        self.config(bg="#999")
+        self.config(bg=self.bg_colour)
 
-        btn = tk.Button(self, text="X", command=lambda: self.quit())
-        btn.grid(row=0, column=1)
+        btn = tk.Button(self, text="X", bg=self.tx_colour, command=lambda: self.quit())
+        btn.pack(anchor="ne")
     
-    # create a keyboard from my custom keyboard library
+        # create a keyboard from my custom keyboard library
         kb = tk_keyboard.Keyboard(self, self.winfo_screenheight(), self.winfo_screenwidth())
         self.kb = kb
         kb.hide()
 
-    # entry
-        item_name = tk.Entry(self, font=font_size)
-        item_name.grid(row=1, column=0)
+        # entry
+        frame = tk.Frame(self, bg=self.bg_colour)
+        frame.pack(anchor="center")
 
-        expiry = tk.Entry(self, font=font_size)
-        expiry.grid(row=2, column=0)
+        item_name = tk.Entry(frame, 
+                            highlightbackground=self.tx_colour,
+                            highlightcolor=self.tx_colour,
+                            highlightthickness=2,
+                            bg=self.bg_colour,
+                            font=font_size)
+        item_name.grid(row=0, column=0)
+
+        expiry = tk.Entry(frame,
+                            highlightbackground=self.tx_colour,
+                            highlightcolor=self.tx_colour,
+                            highlightthickness=2,
+                            bg=self.bg_colour,
+                            font=font_size)
+        expiry.grid(row=1, column=0)
 
         item_name.bind("<FocusIn>", self.entry_focus_in)
         expiry.bind("<FocusIn>", self.entry_focus_in)
 
-        submit = tk.Button(self, text="Submit", command=lambda: self.get_contents())
-        submit.grid(row=3, column=0)
+        self.entries = [item_name, expiry]
+
+        submit = tk.Button(frame, text="Submit", command= lambda: self.get_contents())
+        submit.grid(row=2, column=0)
 
     
 
@@ -67,8 +73,8 @@ class App(tk.Tk):
     # get contents of the labels as well as hide the keyboard
     def get_contents(self):
         self.kb.hide()
-        for i in self.entry_contents.items():
-            print(i[0]+":",i[1])
+        for i in self.entries:
+            print(str(i.winfo_name())+":",i.get())
         print()
     
     # handle the keyboard and it's outputs
@@ -93,7 +99,7 @@ class App(tk.Tk):
 
         elif key.upper() == "CAPS":
             self.caps = not self.caps
-            print(self.entry_contents)
+            # print(self.entry_contents)
 
         elif key == "<":
             self.focus.icursor(cursor_i-1)
@@ -103,9 +109,7 @@ class App(tk.Tk):
 
         else:
             self.focus.insert(cursor_i, key)
-        
-        self.entry_contents[self.focus.winfo_name()] = self.focus.get()
-    
+
 
 
 # RUN
