@@ -7,27 +7,34 @@ import tk_keyboard
 
 # APP
 class App(tk.Tk):
-    bg_colour = "#13131B"
-    tx_colour = "#F2285B"
-    hl_colour = "#009900"
-
     caps = False
     def __init__(self):
         tk.Tk.__init__(self)
 
+        screen_width = self.winfo_screenwidth()
+
+        cl_darkblue = "#13131B"
+        cl_red = "#F2285B"
+        cl_white = "#DDDDDD"
+
 
 
         # variables for later use
-        font_size = font.Font(size=self.winfo_screenwidth()//20)
-        screen_dim = f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}"
+        font_size = font.Font(size=screen_width//20)
+        btn_size = font.Font(size=screen_width//50)
+        # screen_dim = f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}"
 
         # window setup
         self.title("entry label test kb")
         self.attributes("-fullscreen", True)
-        self.config(bg=self.bg_colour)
+        self.config(bg=cl_darkblue)
+        self.option_add("*insertBackground", cl_red)
 
-        btn = tk.Button(self, text="X", bg=self.tx_colour, command=lambda: self.quit())
-        btn.pack(anchor="ne")
+        fr_main = tk.Frame(self, bg=cl_darkblue)
+        fr_main.pack(anchor="center", side="top", fill="x")
+
+        btn = tk.Button(fr_main, text="X", bg=cl_red, font=btn_size, command=lambda: self.quit())
+        btn.pack(anchor="ne", side="right")
     
         # create a keyboard from my custom keyboard library
         kb = tk_keyboard.Keyboard(self, self.winfo_screenheight(), self.winfo_screenwidth())
@@ -35,22 +42,24 @@ class App(tk.Tk):
         kb.hide()
 
         # entry
-        frame = tk.Frame(self, bg=self.bg_colour)
-        frame.pack(anchor="center")
+        fr_entries = tk.Frame(fr_main, bg=cl_darkblue)
+        fr_entries.pack(anchor="n", side="top", pady=screen_width//50)
 
-        item_name = tk.Entry(frame, 
-                            highlightbackground=self.tx_colour,
-                            highlightcolor=self.tx_colour,
+        item_name = tk.Entry(fr_entries, 
+                            highlightbackground=cl_red,
+                            highlightcolor=cl_red,
                             highlightthickness=2,
-                            bg=self.bg_colour,
+                            bg=cl_darkblue,
+                            fg=cl_white,
                             font=font_size)
         item_name.grid(row=0, column=0)
 
-        expiry = tk.Entry(frame,
-                            highlightbackground=self.tx_colour,
-                            highlightcolor=self.tx_colour,
+        expiry = tk.Entry(fr_entries,
+                            highlightbackground=cl_red,
+                            highlightcolor=cl_red,
                             highlightthickness=2,
-                            bg=self.bg_colour,
+                            bg=cl_darkblue,
+                            fg=cl_white,
                             font=font_size)
         expiry.grid(row=1, column=0)
 
@@ -59,7 +68,7 @@ class App(tk.Tk):
 
         self.entries = [item_name, expiry]
 
-        submit = tk.Button(frame, text="Submit", command= lambda: self.get_contents())
+        submit = tk.Button(fr_entries, text="Submit", bg=cl_red, font=btn_size, command=self.get_contents)
         submit.grid(row=2, column=0)
 
     

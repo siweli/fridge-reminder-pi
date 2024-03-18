@@ -46,8 +46,8 @@ class Keyboard(tk.Toplevel):
         # define a custom layout for the keys    
         keyboard = [["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "BACK"],
                     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "CAPS"],
-                    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "-", "/"],
-                    ["Z", "X", "C", "V", "B", "N", "M", ",", ".", "<", ">"],
+                    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "-", "_", "/"],
+                    ["Z", "X", "C", "V", "B", "N", "M", ",", ".", "&", "<", ">"],
                     ["SPACE"]]
         
         # loop through each row of the keyboard and each key of each row
