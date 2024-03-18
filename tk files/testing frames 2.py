@@ -24,14 +24,9 @@ class mainWindow():
         tabList = tk.Frame(master)
         tabList.pack()
 
-        tab1 = tk.Button(tabList, text="tab1", command=lambda m=0: self.switchWindows(m))
-        tab1.pack()
-
-        tab2 = tk.Button(tabList, text="tab2", command=lambda m=1: self.switchWindows(m))
-        tab2.pack()
-
-        tab3 = tk.Button(tabList, text="tab3", command=lambda m=2: self.switchWindows(m))
-        tab3.pack()
+        for c, i in enumerate(["Main", "Account", "Support"]):
+            tab = tk.Button(tabList, text=i, command=lambda m=c: self.switchWindows(m))
+            tab.grid(row=0, column=c)
 
 
         # MAIN WINDOW
