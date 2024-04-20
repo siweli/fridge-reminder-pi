@@ -7,7 +7,7 @@ import re
 mac_add = str(getnode())+"t"
 print(mac_add)
 
-url = "http://localhost:3000/api/regdevice"
+url = "http://localhost:3000/api/pi/regdevice"
 data = {"data" : mac_add}
 
 try:

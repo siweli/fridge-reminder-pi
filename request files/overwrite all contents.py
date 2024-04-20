@@ -6,7 +6,7 @@ mac_add = str(getnode())+"t"
 
 list = [["tomato", "2024-03-12"], ["bread", "2024-03-13"]]
 
-url = "http://localhost:3000/api/receivedevice"
+url = "http://localhost:3000/api/pi/receivedevice"
 data = {"token":mac_add, "contents":list}
 
 try:
