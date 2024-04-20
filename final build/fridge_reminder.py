@@ -11,6 +11,12 @@ class firstWindow(tk.Frame):
         super().__init__(parent)
         self.pack()
 
+        # create keyboard
+        kb = tk_keyboard.Keyboard(self, self.winfo_screenheight(), self.winfo_screenwidth())
+        self.kb = kb
+        self.caps = False
+        kb.hide()
+
         self.font_size = font_size
 
         self.option_add("*Label.Font", "aerial 22 bold")
@@ -27,6 +33,8 @@ class firstWindow(tk.Frame):
     def run_loop(self):
         if self.interacted == False:
             self.load_contents()
+            self.kb.hide()
+            self.focus_set()
             # not interacted with recently so reload
         else:
             self.interacted = False
@@ -74,7 +82,9 @@ class firstWindow(tk.Frame):
             self.months = [str(i) for i in range(1,13)]
             self.years = [str(i) for i in range(2024,2035)]
 
-            tk.Entry(AR_frame, textvariable=self.item_name, width=15, font=self.font_size).grid(column=1,row=0)
+            item_entry = tk.Entry(AR_frame, textvariable=self.item_name, width=15, font=self.font_size)
+            item_entry.grid(column=1,row=0)
+            item_entry.bind("<FocusIn>", self.entry_focus)
 
             # expiry frame for positioning
             EX_frame = tk.Frame(AR_frame)
@@ -86,12 +96,52 @@ class firstWindow(tk.Frame):
 
             tk.Button(AR_frame, text="Add item", bg="#33DD33", command=self.add_row).grid(column=1,row=2)
 
-
-
         except requests.ConnectionError:
             tk.Label(self, text="Could not establish a connection").pack()
     
+    # set focus to the input entry
+    def entry_focus(self, event):
+        self.focus = self.focus_get()
+        self.kb.show()
+    
+    # handle the keyboard and it's outputs
+    def return_key(self, key):
+        cursor_i = self.focus.index("insert")
+        self.interacted = True
+        if not self.caps:
+            key = key.lower()
+
+        if key.upper() == "SPACE":
+            self.focus.insert(cursor_i, " ")
+
+        elif key.upper() == "BACK":
+            contents = self.focus.get()
+            index = cursor_i-1
+            if index == -1:
+                pass
+            else:
+                self.focus.delete(0, "end")
+                contents = contents[:index] + contents[index+1:]
+                self.focus.insert(0, contents)
+                self.focus.icursor(index)
+
+        elif key.upper() == "CAPS":
+            self.caps = not self.caps
+            # print(self.entry_contents)
+
+        elif key == "<":
+            self.focus.icursor(cursor_i-1)
+        
+        elif key == ">":
+            self.focus.icursor(cursor_i+1)
+
+        else:
+            self.focus.insert(cursor_i, key)
+    
     def add_row(self):
+        self.kb.hide()
+        self.focus_set()
+
         item_name = self.item_name.get()
         d = self.expiry_d.get()
         m = self.expiry_m.get()
@@ -109,6 +159,9 @@ class firstWindow(tk.Frame):
                 tk.Label(self, text="Could not establish a connection").pack()
     
     def remove_row(self, id):
+        self.kb.hide()
+        self.focus_set()
+
         url = "http://localhost:3000/api/pi/removerow"
         data = {"data" : DEV_TOKEN, "id" : id}
 
@@ -168,6 +221,7 @@ class App(tk.Tk):
         for c, i in enumerate(["Main", "Account", "Support"]):
             tab = tk.Button(tabList, text=i, bg=cl_red, command=lambda m=c: self.switchWindows(m))
             tab.grid(row=0, column=c)
+
 
 
         # main window
