@@ -4,7 +4,7 @@ import requests
 from uuid import getnode
 import re
 
-mac_add = str(getnode())+"e"
+mac_add = str(getnode())+"t"
 print(mac_add)
 
 url = "http://localhost:3000/api/regdevice"

@@ -2,7 +2,7 @@ import requests
 from uuid import getnode
 import random
 
-mac_add = str(getnode())+"e"
+mac_add = str(getnode())+"t"
 
 list = [["tomato", "2024-03-12"], ["bread", "2024-03-13"]]
 
