@@ -204,12 +204,10 @@ class App(tk.Tk):
         # widget sizes based off screen width
         screen_width = self.winfo_screenwidth()
         font_size = font.Font(size=screen_width//35)
-        btn_size = font.Font(size=screen_width//50)
 
         # window setup
-        self.title("entry label test kb")
+        self.title("Fridge Reminder")
         self.attributes("-fullscreen", True)
-        self.config(bg=cl_darkblue)
         self.option_add("*insertBackground", cl_red)
         self.option_add("*Background", cl_darkblue)
         self.option_add("*Entry.Background", cl_white)
@@ -241,6 +239,68 @@ class App(tk.Tk):
         self.frameList[self.index].tkraise()
         self.frameList[self.index].pack()
 
+
+# main code
+class DisplayCode(tk.Tk):
+    def __init__(self, otp_code):
+        tk.Tk.__init__(self)
+
+        # colour variables
+        cl_darkblue = "#13131B"
+        cl_red = "#F2285B"
+
+        # widget sizes based off screen width
+        screen_width = self.winfo_screenwidth()
+
+        # window setup
+        self.title("Show Code")
+        self.attributes("-fullscreen", True)
+        self.option_add("*Background", cl_darkblue)
+        self.option_add("*Foreground", cl_red)
+        self.option_add("*Label.Font", "aerial 30 bold")
+
+        
+        expand_frame = tk.Frame(self)
+        expand_frame.pack(fill="both", expand=True)
+
+        center_frame = tk.Frame(expand_frame)
+        center_frame.place(relx=0.5, rely=0.5, anchor="center")
+
+        tk.Label(center_frame, text="Enter this one-time password on the website to claim device:").pack()
+        tk.Label(center_frame, text=otp_code, font=("aerial", 60, "bold")).pack()
+
+        self.check_registered()
+    
+    # check if the device has been claimed yet
+    def check_registered(self):
+        url = "http://localhost:3000/api/pi/checkdevice"
+        data = {"data" : DEV_TOKEN}
+
+        try:
+            response = requests.post(url, json=data)
+            if response.json()["claimed"]:
+                self.destroy()
+                App().mainloop()
+
+        except requests.ConnectionError:
+            print("Could not establish a connection")
+        
+        self.after(5000, self.check_registered)
+
+
+
+
 # RUN
 if __name__ == "__main__":
-    App().mainloop()
+    url = "http://localhost:3000/api/pi/regdevice"
+    data = {"data" : DEV_TOKEN}
+
+    try:
+        response = requests.post(url, json=data)
+        if response.json()["claimed"]:
+            App().mainloop()
+        else:
+            DisplayCode(response.json()["code"]).mainloop()
+
+    except requests.ConnectionError:
+        print("Could not establish a connection")
