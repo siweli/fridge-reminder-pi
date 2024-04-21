@@ -127,7 +127,6 @@ class firstWindow(tk.Frame):
 
         elif key.upper() == "CAPS":
             self.caps = not self.caps
-            # print(self.entry_contents)
 
         elif key == "<":
             self.focus.icursor(cursor_i-1)
