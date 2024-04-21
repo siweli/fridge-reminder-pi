@@ -61,11 +61,11 @@ class firstWindow(tk.Frame):
                 row = tk.Frame(self)
                 row.pack()
 
-                tk.Label(row, text=i["name"], bg="#DDDDDD", relief="solid").grid(row=0, column=0)
-                tk.Label(row, text=i["expires"], bg="#DDDDDD", relief="solid").grid(row=0, column=1)
+                tk.Label(row, text=i["name"], fg="#222222", bg="#DDDDDD", relief="solid").grid(row=0, column=0)
+                tk.Label(row, text=i["expires"], fg="#222222", bg="#DDDDDD", relief="solid").grid(row=0, column=1)
 
                 id=i["id"]
-                tk.Button(row, text="-", bg="#DD3333", command=lambda m=id: self.remove_row(m)).grid(row=0, column=2)
+                tk.Button(row, text="-", bg="#DD3333", font="ariel 17 bold", command=lambda m=id: self.remove_row(m)).grid(row=0, column=2)
 
             AR_frame = tk.Frame(self)
             AR_frame.pack()
@@ -178,14 +178,14 @@ class firstWindow(tk.Frame):
 class secondWindow(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        tk.Label(self, text="frame 2").pack()
+        tk.Label(self, text="Your device ID: "+DEV_TOKEN).pack()
         self.pack()
 
 # support window
 class thirdWindow(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        tk.Label(self, text="frame 3").pack()
+        tk.Label(self, text="Call customer support here: 07123456789").pack()
         self.pack()
 
 # main code
@@ -209,13 +209,15 @@ class App(tk.Tk):
         self.title("Fridge Reminder")
         self.attributes("-fullscreen", True)
         self.option_add("*insertBackground", cl_red)
+        self.option_add("*Label.Foreground", cl_red)
         self.option_add("*Background", cl_darkblue)
         self.option_add("*Entry.Background", cl_white)
         self.option_add("*Spinbox.Background", cl_white)
+        self.option_add("*Button.Font", "ariel 20 bold")
 
         # menu bar
         tabList = tk.Frame(self)
-        tabList.pack()
+        tabList.pack(anchor="e")
         for c, i in enumerate(["Main", "Account", "Support"]):
             tab = tk.Button(tabList, text=i, bg=cl_red, command=lambda m=c: self.switchWindows(m))
             tab.grid(row=0, column=c)
@@ -304,3 +306,6 @@ if __name__ == "__main__":
 
     except requests.ConnectionError:
         print("Could not establish a connection")
+    
+    except requests.exceptions.JSONDecodeError:
+        print("Did not receive valid JSON")
