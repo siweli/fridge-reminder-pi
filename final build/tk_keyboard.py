@@ -2,14 +2,6 @@
 import tkinter as tk
 from tkinter import font
 
-
-# # hide exe window on run when converted into an exe
-# import win32gui, win32con
-# exe_window = win32gui.GetForegroundWindow()
-# if win32gui.GetWindowText(exe_window)[-3:] == "exe":
-#     win32gui.ShowWindow(exe_window, win32con.SW_HIDE)
-
-
 # APP
 class Keyboard(tk.Toplevel):
     bg_colour = "#000000" # background colour
@@ -29,7 +21,6 @@ class Keyboard(tk.Toplevel):
         font_size = font.Font(size=int(s_height*0.025))
         h = s_height // 2.5
         geom = f"{s_width}x{s_height//3}+0+{int(s_height-h)}" # set it at the bottom of the screen
-        #geom = f"{s_width}x{s_height//3}+0+200"
         # look into removing the 1px border around the window
 
     # window setup
