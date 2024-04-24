@@ -66,14 +66,12 @@ class firstWindow(tk.Frame):
             for i in contents:
                 row = tk.Frame(self)
                 row.pack()
-
+                # create table for fridge contents (if any exist in database)
                 tk.Label(row, text=i["name"], fg="#222222", bg="#DDDDDD", relief="solid").grid(row=0, column=0)
                 tk.Label(row, text=i["expires"], fg="#222222", bg="#DDDDDD", relief="solid").grid(row=0, column=1)
+                tk.Button(row, text="-", bg="#DD3333", font="ariel 17 bold", command=lambda m=i["id"]: self.remove_row(m)).grid(row=0, column=2)
 
-                id=i["id"]
-                tk.Button(row, text="-", bg="#DD3333", font="ariel 17 bold", command=lambda m=id: self.remove_row(m)).grid(row=0, column=2)
-
-            AR_frame = tk.Frame(self)
+            AR_frame = tk.Frame(self) # AR_frame for add row frame
             AR_frame.pack()
             tk.Label(AR_frame, text="Item name:").grid(column=0,row=0)
             tk.Label(AR_frame, text="Expires:").grid(column=0, row=1)
@@ -89,7 +87,7 @@ class firstWindow(tk.Frame):
             item_entry.bind("<FocusIn>", self.entry_focus)
 
             # expiry frame for positioning
-            EX_frame = tk.Frame(AR_frame)
+            EX_frame = tk.Frame(AR_frame) # EX_frame for expiry frame
             EX_frame.grid(column=1,row=1)
             tk.Spinbox(EX_frame, values=[str(i) for i in range(1,32)], width=3, font=self.font_size, textvariable=self.expiry_d).grid(column=0,row=0)
             tk.Spinbox(EX_frame, values=[str(i) for i in range(1,13)], width=3, font=self.font_size, textvariable=self.expiry_m).grid(column=1,row=0)
