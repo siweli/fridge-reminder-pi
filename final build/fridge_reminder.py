@@ -1,15 +1,20 @@
 import tkinter as tk
 from tkinter import font
+from tkinter.messagebox import showerror
 import tk_keyboard
 import requests
 from uuid import getnode
 
+
+
 DEV_TOKEN = str(getnode())
 # main window with table contents in
 class firstWindow(tk.Frame):
-    def __init__(self, parent, font_size):
+    def __init__(self, parent, font_size, ip):
         super().__init__(parent)
         self.pack()
+
+        self.ip = ip # assign the working ip to self.ip so it can be called in methods
 
         # create keyboard
         kb = tk_keyboard.Keyboard(self, self.winfo_screenheight(), self.winfo_screenwidth())
@@ -21,6 +26,7 @@ class firstWindow(tk.Frame):
 
         self.option_add("*Label.Font", "aerial 22 bold")
 
+        # create events if the application is interacted with at all
         self.bind_all("<Any-ButtonPress>", self.interact_event)
         self.bind_all("<Any-KeyPress>", self.interact_event)
 
@@ -45,13 +51,13 @@ class firstWindow(tk.Frame):
     def interact_event(self, event):
         self.interacted = True
 
-    # table contents and add row to load
+    # destroy all widgets then reload contents
     def load_contents(self):
         widgets = self.pack_slaves()
         for i in widgets:
             i.destroy()
 
-        url = "http://localhost:3000/api/pi/getcontents"
+        url = f"http://{self.ip}:3000/api/pi/getcontents"
         data = {"data" : DEV_TOKEN}
 
         try:
@@ -72,15 +78,11 @@ class firstWindow(tk.Frame):
             tk.Label(AR_frame, text="Item name:").grid(column=0,row=0)
             tk.Label(AR_frame, text="Expires:").grid(column=0, row=1)
 
+            # String variables to get() later when needed
             self.item_name = tk.StringVar(self)
             self.expiry_d = tk.StringVar(self)
             self.expiry_m = tk.StringVar(self)
             self.expiry_y = tk.StringVar(self)
-
-
-            self.days = [str(i) for i in range(1,32)]
-            self.months = [str(i) for i in range(1,13)]
-            self.years = [str(i) for i in range(2024,2035)]
 
             item_entry = tk.Entry(AR_frame, textvariable=self.item_name, width=15, font=self.font_size)
             item_entry.grid(column=1,row=0)
@@ -92,12 +94,10 @@ class firstWindow(tk.Frame):
             tk.Spinbox(EX_frame, values=[str(i) for i in range(1,32)], width=3, font=self.font_size, textvariable=self.expiry_d).grid(column=0,row=0)
             tk.Spinbox(EX_frame, values=[str(i) for i in range(1,13)], width=3, font=self.font_size, textvariable=self.expiry_m).grid(column=1,row=0)
             tk.Spinbox(EX_frame, values=[str(i) for i in range(2024,2035)], width=5, font=self.font_size, textvariable=self.expiry_y).grid(column=2,row=0)
-
-
             tk.Button(AR_frame, text="Add item", bg="#33DD33", command=self.add_row).grid(column=1,row=2)
 
-        except requests.ConnectionError:
-            tk.Label(self, text="Could not establish a connection").pack()
+        except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
+            tk.Label(self, text="Could not establish a connection. Retrying...").pack()
     
     # set focus to the input entry
     def entry_focus(self, event):
@@ -148,26 +148,26 @@ class firstWindow(tk.Frame):
         expiry = f"{y}-{m}-{d}"
 
         if item_name != "":
-            url = "http://localhost:3000/api/pi/addrow"
+            url = f"http://{self.ip}:3000/api/pi/addrow"
             data = {"data" : DEV_TOKEN, "item_name" : item_name, "expires" : expiry}
 
             try:
                 response = requests.post(url, json=data)
                 self.load_contents()
-            except requests.ConnectionError:
+            except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
                 tk.Label(self, text="Could not establish a connection").pack()
     
     def remove_row(self, id):
         self.kb.hide()
         self.focus_set()
 
-        url = "http://localhost:3000/api/pi/removerow"
+        url = f"http://{self.ip}:3000/api/pi/removerow"
         data = {"data" : DEV_TOKEN, "id" : id}
 
         try:
             response = requests.post(url, json=data)
             self.load_contents()
-        except requests.ConnectionError:
+        except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
             tk.Label(self, text="Could not establish a connection").pack()
 
 
@@ -189,7 +189,7 @@ class thirdWindow(tk.Frame):
 
 # main code
 class App(tk.Tk):
-    def __init__(self):
+    def __init__(self, ip):
         tk.Tk.__init__(self)
 
         # colour variables
@@ -228,7 +228,7 @@ class App(tk.Tk):
         mainframe.pack(fill="both", expand=1)
         self.index = 0
 
-        self.frameList = [firstWindow(mainframe, font_size), secondWindow(mainframe), thirdWindow(mainframe)]
+        self.frameList = [firstWindow(mainframe, font_size, ip), secondWindow(mainframe), thirdWindow(mainframe)]
         for c, i in enumerate(self.frameList):
             if c != 0:
                 i.forget()
@@ -243,8 +243,10 @@ class App(tk.Tk):
 
 # main code
 class DisplayCode(tk.Tk):
-    def __init__(self, otp_code):
+    def __init__(self, otp_code, ip):
         tk.Tk.__init__(self)
+
+        self.ip = ip
 
         # colour variables
         cl_darkblue = "#13131B"
@@ -274,17 +276,17 @@ class DisplayCode(tk.Tk):
     
     # check if the device has been claimed yet
     def check_registered(self):
-        url = "http://localhost:3000/api/pi/checkdevice"
+        url = f"http://{self.ip}:3000/api/pi/checkdevice"
         data = {"data" : DEV_TOKEN}
 
         try:
             response = requests.post(url, json=data)
             if response.json()["claimed"]:
                 self.destroy()
-                App().mainloop()
+                App(self.ip).mainloop()
 
-        except requests.ConnectionError:
-            print("Could not establish a connection")
+        except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
+            tk.Label(self, text="Could not establish a connection").pack()
         
         self.after(5000, self.check_registered)
 
@@ -293,18 +295,17 @@ class DisplayCode(tk.Tk):
 
 # RUN
 if __name__ == "__main__":
-    url = "http://localhost:3000/api/pi/regdevice"
-    data = {"data" : DEV_TOKEN}
+    ips = ["localhost", "172.26.188.135"]
+    for i in ips:
+        url = f"http://{i}:3000/api/pi/regdevice"
+        data = {"data" : DEV_TOKEN}
 
     try:
         response = requests.post(url, json=data)
         if response.json()["claimed"]:
-            App().mainloop()
+            App(i).mainloop()
         else:
-            DisplayCode(response.json()["code"]).mainloop()
+            DisplayCode(response.json()["code"], i).mainloop()
 
-    except requests.ConnectionError:
-        print("Could not establish a connection")
-    
-    except requests.exceptions.JSONDecodeError:
-        print("Did not receive valid JSON")
+    except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
+        showerror(title="Error", message="Could not establish a connection")
