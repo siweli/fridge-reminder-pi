@@ -76,11 +76,11 @@ class firstWindow(tk.Frame):
             tk.Label(AR_frame, text="Item name:").grid(column=0,row=0)
             tk.Label(AR_frame, text="Expires:").grid(column=0, row=1)
 
-            # String variables to get() later when needed
+            # String and Int variables to get() later when needed
             self.item_name = tk.StringVar(self)
-            self.expiry_d = tk.StringVar(self)
-            self.expiry_m = tk.StringVar(self)
-            self.expiry_y = tk.StringVar(self)
+            self.expiry_d = tk.IntVar(self)
+            self.expiry_m = tk.IntVar(self)
+            self.expiry_y = tk.IntVar(self)
 
             item_entry = tk.Entry(AR_frame, textvariable=self.item_name, width=15, font=self.font_size)
             item_entry.grid(column=1,row=0)
@@ -104,16 +104,16 @@ class firstWindow(tk.Frame):
     
     # handle the keyboard and it's outputs
     def return_key(self, key):
-        cursor_i = self.focus.index("insert")
+        cursor_i = self.focus.index("insert") # get the position of the cursor in the input
         self.interacted = True
-        if not self.caps:
+        if not self.caps: # if caps lock is not on then the input is treat as lowercase
             key = key.lower()
 
-        if key.upper() == "SPACE":
+        if key.upper() == "SPACE": # if the key is SPACE then insert a space
             self.focus.insert(cursor_i, " ")
 
-        elif key.upper() == "BACK":
-            contents = self.focus.get()
+        elif key.upper() == "BACK":         # if the key is BACKSPACE then get the contents of the input, pass if the input is empty,
+            contents = self.focus.get()     # if not then remove the key before the cursor then paste that string back into the input
             index = cursor_i-1
             if index == -1:
                 pass
@@ -123,27 +123,29 @@ class firstWindow(tk.Frame):
                 self.focus.insert(0, contents)
                 self.focus.icursor(index)
 
-        elif key.upper() == "CAPS":
+        elif key.upper() == "CAPS": # if key is CAPS then reverse the caps state (True/False)
             self.caps = not self.caps
 
-        elif key == "<":
+        elif key == "<": # if the key is LEFT ARROW then move the cursor 1 place to the left
             self.focus.icursor(cursor_i-1)
         
-        elif key == ">":
+        elif key == ">": # if the key is RIGHT ARROW then move the cursor 1 place to the right
             self.focus.icursor(cursor_i+1)
 
-        else:
+        else: # else then insert whatever key was pressed as it should only be a letter
             self.focus.insert(cursor_i, key)
     
+    # add an item to the fridge contents
     def add_row(self):
         self.kb.hide()
         self.focus_set()
 
+        # get the string variables (the input values)
         item_name = self.item_name.get()
-        d = self.expiry_d.get()
-        m = self.expiry_m.get()
+        d = "%02d" % self.expiry_d.get()
+        m = "%02d" % self.expiry_m.get()
         y = self.expiry_y.get()
-        expiry = f"{y}-{m}-{d}"
+        expiry = f"{y}-{m}-{d}" # format into the same date format the website handles
 
         if item_name != "":
             url = f"http://{self.ip}:3000/api/pi/addrow"
@@ -155,6 +157,7 @@ class firstWindow(tk.Frame):
             except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
                 tk.Label(self, text="Could not establish a connection").pack()
     
+    # remove an item from the fridge contents
     def remove_row(self, id):
         self.kb.hide()
         self.focus_set()
@@ -195,9 +198,6 @@ class App(tk.Tk):
         cl_red = "#F2285B"
         cl_white = "#DDDDDD"
 
-        # token
-        dev_token = str(getnode())
-
         # widget sizes based off screen width
         screen_width = self.winfo_screenwidth()
         font_size = font.Font(size=screen_width//35)
@@ -218,8 +218,6 @@ class App(tk.Tk):
         for c, i in enumerate(["Main", "Account", "Support"]):
             tab = tk.Button(tabList, text=i, bg=cl_red, command=lambda m=c: self.switchWindows(m))
             tab.grid(row=0, column=c)
-
-
 
         # main window
         mainframe = tk.Frame(self)
@@ -244,14 +242,11 @@ class DisplayCode(tk.Tk):
     def __init__(self, otp_code, ip):
         tk.Tk.__init__(self)
 
-        self.ip = ip
+        self.ip = ip # assign the working ip to self.ip so it can be called in methods
 
         # colour variables
         cl_darkblue = "#13131B"
         cl_red = "#F2285B"
-
-        # widget sizes based off screen width
-        screen_width = self.winfo_screenwidth()
 
         # window setup
         self.title("Show Code")
@@ -289,11 +284,9 @@ class DisplayCode(tk.Tk):
         self.after(5000, self.check_registered)
 
 
-
-
 # RUN
 if __name__ == "__main__":
-    ips = ["localhost", "172.26.188.135"]
+    ips = ["localhost", "172.26.188.135"] # ip addresses to attempt to connect to
     for i in ips:
         url = f"http://{i}:3000/api/pi/regdevice"
         data = {"data" : DEV_TOKEN}
@@ -301,9 +294,9 @@ if __name__ == "__main__":
     try:
         response = requests.post(url, json=data)
         if response.json()["claimed"]:
-            App(i).mainloop()
+            App(i).mainloop() # i is the ip attempted and if successful is passed into the application to be used as the working ip
         else:
-            DisplayCode(response.json()["code"], i).mainloop()
+            DisplayCode(response.json()["code"], i).mainloop() # again, i is the working ip
 
     except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
         showerror(title="Error", message="Could not establish a connection")
