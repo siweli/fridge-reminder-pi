@@ -16,14 +16,13 @@ class Keyboard(tk.Toplevel):
         self.parent = parent
         tk.Toplevel.__init__(self)
 
-
-    # variables for later use
+        # variables for later use
         font_size = font.Font(size=int(s_height*0.025))
         h = s_height // 2.5
         geom = f"{s_width}x{s_height//3}+0+{int(s_height-h)}" # set it at the bottom of the screen
         # look into removing the 1px border around the window
 
-    # window setup
+        # window setup
         self.title("Keyboard")
         self.geometry(geom)
         self.resizable(0, 0)
@@ -31,9 +30,7 @@ class Keyboard(tk.Toplevel):
         self.config(bg=self.bg_colour)
         self.attributes('-topmost', True)
         
-
-
-    # keys
+        # keys
         # define a custom layout for the keys    
         keyboard = [["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "BACK"],
                     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "CAPS"],
@@ -50,7 +47,7 @@ class Keyboard(tk.Toplevel):
                 else: col_span = 1
                 if key == "SPACE": col_shift, col_span = 4, 4
 
-            # border for key
+                # border for key
                 border = tk.Frame(self,
                                   bg=self.bg_colour,
                                   highlightbackground=self.bd_colour,
@@ -63,7 +60,7 @@ class Keyboard(tk.Toplevel):
                             column=column_count+col_shift,
                             columnspan=col_span)
             
-            # button for each key
+                # button for each key
                 tk.Button(border,
                           text=key,
                           font=font_size,
@@ -79,18 +76,18 @@ class Keyboard(tk.Toplevel):
                 self.columnconfigure(column_count, weight=1)
                 if key == "CAPS": col_shift=1 # handle the double width keys that arent on the end or the keys overlap
                 
-# on each key press
+    # on each key press
     def on_press(self, key):
         self.parent.return_key(key)
 
-# show the keyboard window
+    # show the keyboard window
     def show(self):
         self.deiconify()
 
-# hide the keyboard window
+    # hide the keyboard window
     def hide(self):
         self.withdraw()
 
-# close the keyboard window
+    # close the keyboard window
     def kill(self):
         self.destroy()

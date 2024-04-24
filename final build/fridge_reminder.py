@@ -7,7 +7,7 @@ from uuid import getnode
 
 
 
-DEV_TOKEN = str(getnode())
+DEV_TOKEN = str(getnode())+"a"
 # main window with table contents in
 class firstWindow(tk.Frame):
     def __init__(self, parent, font_size, ip):
