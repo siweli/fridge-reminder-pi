@@ -7,7 +7,7 @@ from uuid import getnode
 
 
 
-DEV_TOKEN = str(getnode())+"a"
+DEV_TOKEN = str(getnode())
 # main window with table contents in
 class firstWindow(tk.Frame):
     def __init__(self, parent, font_size, ip):
@@ -96,6 +96,8 @@ class firstWindow(tk.Frame):
 
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError): # Catch if the website or database is not running
             tk.Label(self, text="Could not establish a connection. Retrying...").pack()
+        except KeyError: # Catch if I delete the device from database while code is running
+            tk.Label(self, text="Device not found. Retrying...").pack()
     
     # set focus to the input entry
     def entry_focus(self, event):
